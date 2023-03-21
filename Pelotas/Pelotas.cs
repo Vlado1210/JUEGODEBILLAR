@@ -210,7 +210,7 @@ namespace Pelotas
             //PLAYER1 JUEGA CON LISAS (AMARILLAS)
             if (turno1 == true)
             {
-              g.FillEllipse(new SolidBrush(Color.Wheat), MousePosition.X, MousePosition.Y, 17, 17);
+              g.FillEllipse(new SolidBrush(Color.Yellow), MousePosition.X, MousePosition.Y, 17, 17);
                 if (balls[3].radio < 5)
                 {
                     if (balls[6].x > 0 && balls[7].x >0 && balls[2].x>0)
@@ -226,7 +226,7 @@ namespace Pelotas
             //PLAYER2 JUEGA CON RAYADAS (ROJAS)
             if (turno2 == true)
             {
-              g.FillEllipse(new SolidBrush(Color.Blue), MousePosition.X, MousePosition.Y, 17, 17);
+              g.FillEllipse(new SolidBrush(Color.Red), MousePosition.X, MousePosition.Y, 17, 17);
                 if (balls[3].radio < 5)
                 {
                     if (balls[6].x > 0 && balls[7].x > 0 && balls[2].x > 0)

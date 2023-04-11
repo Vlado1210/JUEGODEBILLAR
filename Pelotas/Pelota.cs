@@ -44,7 +44,7 @@ namespace Pelotas
         {
             for (int b = index + 1; b < balls.Count; b++)
             {
-                CollisionMMLN(balls[b], balls[1], emitter);
+                CollisionMAMALONA(balls[b], balls[1], emitter);
             }
 
             if ((x - radio) <= 0 || (x + radio) >= space.Width)
@@ -120,38 +120,38 @@ namespace Pelotas
 
 
 
-            float distanciataco = (float)Math.Sqrt(Math.Pow((emitter.PosX - bolablanca.x), 2) + Math.Pow((emitter.PosY - bolablanca.y), 2));
+            float distanciataco = (float)Math.Sqrt(Math.Pow((emitter.PosX - otraPelota.x), 2) + Math.Pow((emitter.PosY - otraPelota.y), 2));
 
-            if (distanciataco < (bolablanca.radio + emitter.Size))
+            if (distanciataco < (otraPelota.radio + emitter.Size))
             {
 
-                float masaTotaltaco = bolablanca.radio + emitter.Size;
-                float masaRelativataco = bolablanca.radio / masaTotaltaco;
+                float masaTotaltaco = otraPelota.radio + emitter.Size;
+                float masaRelativataco = otraPelota.radio / masaTotaltaco;
 
 
-                float angulotaco = (float)Math.Atan2(emitter.PosY - bolablanca.y, emitter.PosX - bolablanca.x);
-                float factorDeReducciontaco = 0.07f;
+                float angulotaco = (float)Math.Atan2(emitter.PosY - otraPelota.y, emitter.PosX - otraPelota.x);
+                float factorDeReducciontaco = 0.007f;
 
-                float v1fx1 = bolablanca.vx - masaRelativataco * (bolablanca.vx - 100) * (float)Math.Cos(angulotaco) * factorDeReducciontaco;
-                float v1fy1 = bolablanca.vy - masaRelativataco * (bolablanca.vy - 100) * (float)Math.Sin(angulotaco) * factorDeReducciontaco;
-
-                
+                float v1fx1 = otraPelota.vx - masaRelativataco * (otraPelota.vx - 100) * (float)Math.Cos(angulotaco) * factorDeReducciontaco;
+                float v1fy1 = otraPelota.vy - masaRelativataco * (otraPelota.vy - 100) * (float)Math.Sin(angulotaco) * factorDeReducciontaco;
 
                 
 
-                float v2fx1 = 10 - masaRelativataco * (10 - bolablanca.vx) / 100;
-                float v2fy1 = 10 - masaRelativataco * (10 - bolablanca.vy) / 100;
+                
+
+                float v2fx1 = 10 - masaRelativataco * (10 - otraPelota.vx) / 10000;
+                float v2fy1 = 10 - masaRelativataco * (10 - otraPelota.vy) / 10000;
 
 
-                bolablanca.vx = v1fx1;
-                bolablanca.vy = v1fy1;
+                otraPelota.vx = v1fx1;
+                otraPelota.vy = v1fy1;
 
-                float distanciaOverlaptaco = (bolablanca.radio + emitter.Size) - distanciataco;
-                float dx = (bolablanca.x - emitter.PosX) / distanciataco;
-                float dy = (bolablanca.y - emitter.PosY) / distanciataco;
+                float distanciaOverlaptaco = (otraPelota.radio + emitter.Size) - distanciataco;
+                float dx = (otraPelota.x - emitter.PosX) / distanciataco;
+                float dy = (otraPelota.y - emitter.PosY) / distanciataco;
 
-                bolablanca.x += dx * distanciaOverlaptaco / 2f;
-                bolablanca.y += dy * distanciaOverlaptaco / 2f;
+                otraPelota.x += dx * distanciaOverlaptaco / 2f;
+                otraPelota.y += dy * distanciaOverlaptaco / 2f;
 
 
             }
@@ -237,6 +237,98 @@ namespace Pelotas
 
         }
 
+        public void CollisionMAMALONA(Pelota otraPelota, Pelota bolablanca, Emitter emitter)
+        {
+            float distanciaX = otraPelota.x - this.x;
+            float distanciaY = otraPelota.y - this.y;
+            float distancia = (float)Math.Sqrt(distanciaX * distanciaX + distanciaY * distanciaY);
+
+            if (distancia < (this.radio + otraPelota.radio))//ESTO SIGNIFICA COLISIÓN...
+            {
+                // Calculamos las velocidades finales de cada pelota en función de su masa y velocidad inicial
+                float masaTotal = this.radio + otraPelota.radio;
+                float masaRelativa = this.radio / masaTotal;
+
+                // Componentes de velocidad en la dirección del choque
+                float v1fParalela = ((this.vx * distanciaX) + (this.vy * distanciaY)) / distancia;
+                float v2fParalela = ((otraPelota.vx * distanciaX) + (otraPelota.vy * distanciaY)) / distancia;
+
+                // Componentes de velocidad en la dirección perpendicular al choque
+                float v1fPerpendicular = ((this.vx * distanciaY) - (this.vy * distanciaX)) / distancia;
+                float v2fPerpendicular = ((otraPelota.vx * distanciaY) - (otraPelota.vy * distanciaX)) / distancia;
+
+                // Velocidades finales en la dirección del choque
+                float v1fx = ((masaRelativa * (otraPelota.radio - this.radio) * v1fParalela) + ((1 + masaRelativa) * this.radio * v2fParalela)) / masaTotal;
+                float v2fx = ((masaRelativa * (this.radio - otraPelota.radio) * v2fParalela) + ((1 + masaRelativa) * otraPelota.radio * v1fParalela)) / masaTotal;
+
+                // Velocidades finales en la dirección perpendicular al choque
+                float v1fy = v1fPerpendicular;
+                float v2fy = v2fPerpendicular;
+
+                // Actualizamos las velocidades de las pelotas
+                this.vx = v1fx * distanciaX / distancia + v1fy * distanciaY / distancia;
+                this.vy = v1fx * distanciaY / distancia - v1fy * distanciaX / distancia;
+
+                otraPelota.vx = v2fx * distanciaX / distancia + v2fy * distanciaY / distancia;
+                otraPelota.vy = v2fx * distanciaY / distancia - v2fy * distanciaX / distancia;
+
+                // Movemos las pelotas para evitar que se superpongan
+                float distanciaOverlap = (this.radio + otraPelota.radio) - distancia;
+                float dx = (this.x - otraPelota.x) / distancia;
+                float dy = (this.y - otraPelota.y) / distancia;
+
+                this.x += dx * distanciaOverlap / 2f;
+                this.y += dy * distanciaOverlap / 2f;
+
+                otraPelota.x -= dx * distanciaOverlap / 2f;
+                otraPelota.y -= dy * distanciaOverlap / 2f;
+            }
+
+            //float distanciataco = (float)Math.Sqrt(Math.Pow((emitter.PosX - bolablanca.x), 2) + Math.Pow((emitter.PosY - bolablanca.y), 2));
+
+            float distanciaXtaco = emitter.PosX - bolablanca.x;
+            float distanciaYtaco = emitter.PosY - bolablanca.y;
+            float distanciataco = (float)Math.Sqrt(distanciaXtaco * distanciaXtaco + distanciaYtaco * distanciaYtaco);
+
+
+            //NO ORGINALES 
+            /* float distanciaXtaco = bolablanca.x - emitter.PosX;
+             float distanciaYtaco = bolablanca.y - emitter.PosX;
+
+             float distanciataco = (float)Math.Sqrt(distanciaXtaco * distanciaXtaco + distanciaYtaco * distanciaYtaco); */
+
+
+            if (distanciataco < (bolablanca.radio + emitter.Size))
+            {
+
+
+                float v1fParalela = ((bolablanca.vx * distanciaXtaco) + (bolablanca.vy * distanciaYtaco)) / distanciataco;
+                float v1fPerpendicular = ((bolablanca.vy * distanciaXtaco) - (bolablanca.vx * distanciaYtaco)) / distanciataco;
+                float v2fParalela = (((float)0.2 * distanciaXtaco) + ((float)0.2 * distanciaYtaco)) / distanciataco;
+                float v2fPerpendicular = (((float)0.2 * distanciaXtaco) - ((float)0.2 * distanciaYtaco)) / distanciataco;
+
+                //bolablanca.vx = v1fParalela + v2fParalela;
+                //bolablanca.vy = v1fPerpendicular + v2fPerpendicular;
+
+                bolablanca.vx = v1fPerpendicular;
+                bolablanca.vy = v2fParalela;
+
+                float distanciaOverlaptaco = (bolablanca.radio + emitter.Size) - distanciataco;
+                float dx = (bolablanca.x - emitter.PosX) / distanciataco;
+                float dy = (bolablanca.y - emitter.PosY) / distanciataco;
+
+                bolablanca.x += dx * distanciaOverlaptaco / 2f;
+                bolablanca.y += dy * distanciaOverlaptaco / 2f;
+
+                distanciaXtaco = 0;
+                distanciaYtaco = 0;
+                distanciataco = 0;
+                v1fParalela = 0;
+                v1fPerpendicular = 0;
+                v2fParalela = 0;
+                v2fPerpendicular = 0;
+            }
+        }
         public void CollisionMMLN(Pelota otraPelota, Pelota bolablanca, Emitter emitter)
         {
             float distanciaX = otraPelota.x - this.x;
@@ -332,5 +424,6 @@ namespace Pelotas
 
 
     }
+
 
 }
